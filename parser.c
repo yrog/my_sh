@@ -8,45 +8,67 @@
 static char* removeWhiteSpaces(char *string);
 static int isEndOfCmd(char c);
 static int isEndOfArgs(char c);
+//static int isAlphaNumChar(char c);
 
+/*!
+ * \fn      getCmdAndArgs
+ * \brief   Retourne le pointeur sur la commande et la liste des arguments
+ */
 int getCmdAndArgs(char *iString, char *oCmd, char *oArgs)
 {
+    int stringIndex = 0;
+    int cmdIndex = 0;
+    int argIndex = 0;
+    
+    char *string = iString;
+    
     //On supprime les espaces de début de commande
-    iString = removeWhiteSpaces(iString);
+    string = removeWhiteSpaces(&string[stringIndex]);
+    
+    while (isEndOfCmd(string[stringIndex]) == 0)
+    {
+        oCmd[cmdIndex] = string[stringIndex];
+        stringIndex++;
+        cmdIndex++;
+    }
+    oCmd[cmdIndex] = '\0';
+
+#ifdef _DEBUG
+    printf("Commande: %s\n", oCmd);
+#endif
+    
+    //On supprime les espaces entre la fin de la commande et le début des arguments
+    string = removeWhiteSpaces(&string[stringIndex]);
+    stringIndex = 0;
+    
+    while (isEndOfArgs(string[stringIndex]) == 0)
+    {
+        oArgs[argIndex] = string[stringIndex];
+        stringIndex++;
+        argIndex++;
+    }
+    oArgs[argIndex] = '\0';
+    
+#ifdef _DEBUG
+    printf("Arguments: %s\n", oCmd);
+#endif
+    
     
     return 0;
 }
 
 /*!
- * \fn      getCommand
- * \brief   Retourne un pointeur sur le premier caractère de la commande
+ * \fn      getStringSize
+ * \brief   Retourne la taille de la string (terminée par \0) passée en paramètre
  */
-char* getCommand(char *string)
+int getStringSize(char *iString)
 {
-    //On supprime les espaces de début de commande
-    string = removeWhiteSpaces(string);
+    int index = 0;
     
-    while (!isEndOfCmd(*string))
-    {
-        string++;
-    }
-    return string;
-}
-
-/*!
- * \fn      getArgs
- * \brief   Retourne un pointeur sur le premier caractère du permier argument
- */
-char* getArgs(char *string)
-{
-    //On supprime les espaces de début de commande
-    string = removeWhiteSpaces(string);
+    while (iString[index] != '\0')
+        index ++;
     
-    while (!isEndOfArgs(*string))
-    {
-        string++;
-    }
-    return string;
+    return index;
 }
 
 
@@ -56,12 +78,13 @@ char* getArgs(char *string)
  */
 static char* removeWhiteSpaces(char *string)
 {
-    while ((*string == ' ') || (*string == '\t') || (*string == '\n') || (*string == '\r'))
+    char *pString = string;
+    while ((*pString == ' ') || (*pString == '\t') || (*pString == '\n') || (*pString == '\r'))
     {
-        string ++;
+        pString ++;
     }
     
-    return string;
+    return pString;
 }
 
 
@@ -71,6 +94,9 @@ static char* removeWhiteSpaces(char *string)
  */
 static int isEndOfCmd(char c)
 {
+#ifdef _DEBUG
+    printf ("isEndOfCmd(%c)\n", c);
+#endif
     switch (c)
     {
         case ' ':
@@ -95,6 +121,9 @@ static int isEndOfCmd(char c)
  */
 static int isEndOfArgs(char c)
 {
+#ifdef _DEBUG
+    printf ("isEndOfArgs(%c)\n", c);
+#endif
     switch (c)
     {
         case '|':
@@ -110,3 +139,15 @@ static int isEndOfArgs(char c)
     }
     return 0;
 }
+
+/*!
+ * \fn      isAlphaNumChar
+ * \brief   Détermine si le caractère passé en paramètre est un caractère alphanumérique
+ */
+/*static int isAlphaNumChar(char c)
+{
+    if (((c >= 'a') && (c <= 'Z')) || ((c >= '0') && (c <= '9')))
+        return 1;
+    
+    return 0;
+}*/
